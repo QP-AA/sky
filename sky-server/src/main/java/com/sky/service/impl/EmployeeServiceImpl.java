@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
@@ -64,13 +65,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void save(EmployeeDTO employeeDTO) {
         Employee emp = new Employee();
         BeanUtils.copyProperties(employeeDTO, emp);
+
+
         emp.setCreateTime(LocalDateTime.now());
         emp.setUpdateTime(LocalDateTime.now());
         emp.setStatus(StatusConstant.ENABLE);
         emp.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        // TODO 修改为用户id
-        emp.setCreateUser(1L);
-        emp.setUpdateUser(1L);
+
+        Long userId = BaseContext.getCurrentId();  // 获取当前用户id
+        emp.setCreateUser(userId);
+        emp.setUpdateUser(userId);
         employeeMapper.save(emp);
     }
 
