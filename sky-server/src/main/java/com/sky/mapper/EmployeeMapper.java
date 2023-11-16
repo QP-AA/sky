@@ -28,4 +28,7 @@ public interface EmployeeMapper {
 
 //    @Update("update employee set status = #{status} where id = #{id}")
     public void update(Employee emp);
+
+    @Select("select * from employee where id = #{id}")
+    public Employee getById(Long id);
 }
