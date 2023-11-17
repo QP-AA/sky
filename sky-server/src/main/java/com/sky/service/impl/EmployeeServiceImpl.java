@@ -72,14 +72,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employeeDTO, emp);
 
 
-        emp.setCreateTime(LocalDateTime.now());
-        emp.setUpdateTime(LocalDateTime.now());
+//        emp.setCreateTime(LocalDateTime.now());
+//        emp.setUpdateTime(LocalDateTime.now());
         emp.setStatus(StatusConstant.ENABLE);
         emp.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 
-        Long userId = BaseContext.getCurrentId();  // 获取当前用户id
-        emp.setCreateUser(userId);
-        emp.setUpdateUser(userId);
+//        Long userId = BaseContext.getCurrentId();  // 获取当前用户id
+//        emp.setCreateUser(userId);
+//        emp.setUpdateUser(userId);
         employeeMapper.save(emp);
     }
 
@@ -87,7 +87,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
-        Page<Employee> page =  employeeMapper.pageQuery(employeePageQueryDTO);
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
         List<Employee> result = page.getResult();
         return new PageResult(total, result);
@@ -96,8 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void startOrStop(Integer status, Long id) {
 
-        Employee emp = Employee.builder().status(status).id(id)
-                .updateTime(LocalDateTime.now()).updateUser(BaseContext.getCurrentId()).build();
+        Employee emp = Employee.builder().status(status).id(id).build();
         employeeMapper.update(emp);
     }
 
@@ -108,8 +107,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employeeDTO, emp);
 
         // 设置更新时间和用户
-        emp.setUpdateUser(BaseContext.getCurrentId());
-        emp.setUpdateTime(LocalDateTime.now());
+//        emp.setUpdateUser(BaseContext.getCurrentId());
+//        emp.setUpdateTime(LocalDateTime.now());
 
         employeeMapper.update(emp);
     }
