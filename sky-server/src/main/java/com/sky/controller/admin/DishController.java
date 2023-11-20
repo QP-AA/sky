@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /*
     菜品管理
  */
@@ -39,4 +41,16 @@ public class DishController {
         PageResult result = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(result);
     }
-}
+
+
+    /*
+    `   批量删除
+     */
+    @DeleteMapping
+    public Result delete(@RequestParam List<Long> ids) {
+
+        log.info("批量删除");
+        dishService.deleteBatch(ids);
+        return Result.success();
+    }
+ }
