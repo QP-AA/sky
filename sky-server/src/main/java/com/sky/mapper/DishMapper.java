@@ -37,4 +37,7 @@ public interface DishMapper {
     public void deleteById(Long id);
 
     public void deleteByIds(List<Long> ids);
+
+    @AutoFill(OperationType.UPDATE)
+    public void update(Dish dish);
 }
