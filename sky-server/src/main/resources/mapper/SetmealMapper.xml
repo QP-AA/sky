@@ -11,6 +11,10 @@
                 #{createUser}, #{updateUser})
     </insert>
 
+    <delete id="deleteByIds">
+        delete from setmeal where id in <foreach collection="ids" item="id" separator="," open="(" close=")">#{id}</foreach>
+    </delete>
+
     <select id="pageQuery" resultType="com.sky.vo.SetmealVO">
         select s.*, c.name categoryName from setmeal s left
         join category c on s.category_id = c.id
@@ -20,6 +24,10 @@
             <if test="status != null">and s.status = #{status}</if>
         </where>
         order by s.create_time desc
+    </select>
+    <select id="getByIds" resultType="com.sky.entity.Setmeal">
+        select * from setmeal
+        where id in <foreach collection="ids" separator="," item="id" open="(" close=")">#{id}</foreach>
     </select>
 
 </mapper>
