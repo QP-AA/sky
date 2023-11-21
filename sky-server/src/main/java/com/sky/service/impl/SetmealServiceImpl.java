@@ -30,7 +30,7 @@ public class SetmealServiceImpl implements SetmealService {
         BeanUtils.copyProperties(setmealDTO, setmeal);
         setmealMapper.add(setmeal);
         // 将分类id赋值给菜品
-        Long id = setmealDTO.getId();
+        Long id = setmeal.getId();
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(id));
         setmealDishMapper.insertBatch(setmealDishes);
