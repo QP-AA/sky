@@ -29,8 +29,9 @@ public interface SetmealMapper {
 
     List<Setmeal> getByIds(List<Long> ids);
 
-//    @Select("select * from setmeal where id = #{id}")
-//    Setmeal getById(Long id);
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
 
     void deleteByIds(List<Long> ids);
+
 }
