@@ -59,10 +59,20 @@ public class SetmealController {
     }
 
 
+    /*
+        修改菜品
+     */
     @PutMapping
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("修改菜品");
         setmealService.update(setmealDTO);
+        return Result.success();
+    }
+
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("起售、停售套餐");
+        setmealService.startOrStop(status, id);
         return Result.success();
     }
 }
