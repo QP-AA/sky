@@ -38,7 +38,7 @@
                 checkout_time=#{checkoutTime},
             </if>
             <if test="status != null">
-                status = #{status},
+                status=#{status},
             </if>
             <if test="deliveryTime != null">
                 delivery_time = #{deliveryTime}
