@@ -23,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -225,5 +226,44 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
 
         shoppingCartMapper.insertBatch(shoppingCartList);
+    }
+
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+        List<OrderVO> orderVOList = getOrderVOList(page);
+        return new PageResult(page.getTotal(), orderVOList);
+    }
+
+    private List<OrderVO> getOrderVOList(Page<Orders> page) {
+        List<OrderVO> orderVOList = new ArrayList<>();
+        List<Orders> ordersList = page.getResult();
+
+        if (!CollectionUtils.isEmpty(ordersList)) {
+            orderVOList = ordersList.stream().map(x -> {
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(x, orderVO);
+                String orderDishes = getOrderDishesStr(x);
+                orderVO.setOrderDishes(orderDishes);
+                return orderVO;
+            }).collect(Collectors.toList());
+        }
+        return orderVOList;
+    }
+
+    private String getOrderDishesStr(Orders orders) {
+        // 查询订单菜品详情信息（订单中的菜品和数量）
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+
+        // 将每一条订单菜品信息拼接为字符串（格式：宫保鸡丁*3；）
+        List<String> orderDishList = orderDetailList.stream().map(x -> {
+            String orderDish = x.getName() + "*" + x.getNumber() + ";";
+            return orderDish;
+        }).collect(Collectors.toList());
+
+        // 将该订单对应的所有菜品信息拼接在一起
+        return String.join("", orderDishList);
     }
 }
