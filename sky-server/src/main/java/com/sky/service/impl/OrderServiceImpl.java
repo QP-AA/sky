@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +62,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${sky.baidu.ak}")
     private String ak;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
     @Override
     @Transactional
     public OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO) {
@@ -141,15 +145,7 @@ public class OrderServiceImpl implements OrderService {
 
         vo.setPackageStr(jsonObject.getString("package"));
         paySuccess(ordersPaymentDTO.getOrderNumber());
-//        //为替代微信支付成功后的数据库订单状态更新，多定义一个方法进行修改
-//
-//        Integer OrderPaidStatus = Orders.PAID; //支付状态，已支付
-//
-//        Integer OrderStatus = Orders.TO_BE_CONFIRMED;  //订单状态，待接单
-//        //发现没有将支付时间 check_out属性赋值，所以在这里更新
-//        LocalDateTime check_out_time = LocalDateTime.now();
-//        Orders order = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
-//        orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time, order.getId());
+
 
         return vo;
     }
@@ -173,6 +169,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // 通过websocket向客户端浏览器提送消息
+        Map map = new HashMap<>();
+        map.put("type", 1);
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号" + outTradeNo);
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     @Override
@@ -316,6 +320,18 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.COMPLETED)
                 .build();
         orderMapper.update(orders);
+    }
+
+    @Override
+    public void reminder(Long id) {
+        Orders orders = orderMapper.getById(id);
+        // 通过websocket向客户端浏览器提送消息
+        Map map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", id);
+        map.put("content", "订单号" + orders.getNumber());
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     private List<OrderVO> getOrderVOList(Page<Orders> page) {
