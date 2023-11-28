@@ -270,6 +270,40 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
+    /**
+     * 取消订单
+     * @param ordersCancelDTO
+     */
+    @Override
+    public void cancelByAdmin(OrdersCancelDTO ordersCancelDTO) {
+        Orders order = orderMapper.getById(ordersCancelDTO.getId());
+//        if (order == null || !order.getStatus().equals(Orders.CONFIRMED)) {
+//            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+//        }
+        order.setStatus(Orders.CANCELLED);
+        order.setCancelReason(ordersCancelDTO.getCancelReason());
+        order.setCancelTime(LocalDateTime.now());
+        orderMapper.update(order);
+    }
+
+    @Override
+    public void delivery(Long id) {
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.DELIVERY_IN_PROGRESS)
+                .build();
+        orderMapper.update(orders);
+    }
+
+    @Override
+    public void complete(Long id) {
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.COMPLETED)
+                .build();
+        orderMapper.update(orders);
+    }
+
     private List<OrderVO> getOrderVOList(Page<Orders> page) {
         List<OrderVO> orderVOList = new ArrayList<>();
         List<Orders> ordersList = page.getResult();
