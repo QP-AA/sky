@@ -61,3 +61,7 @@ sky:
     notifyUrl: ${sky.wechat.notifyUrl}
     refundNotifyUrl: ${sky.wechat.refundNotifyUrl}
 
+  shop:
+    address: 西安市长安区西安交通大学创新港校区
+  baidu:
+    ak: 90X5wN2IfCKbPiYFwBExFF5OTZRuRFAe
