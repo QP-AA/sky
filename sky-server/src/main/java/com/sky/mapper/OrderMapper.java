@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface OrderMapper {
@@ -38,4 +39,10 @@ public interface OrderMapper {
 
     @Select("select count(*) from orders where status = #{id};")
     Integer statistics(Integer id);
+
+    @Select("select * from orders where status = #{toBeConfirmed} and order_time < #{now};")
+    List<Orders> getByStatusAndOrderTime(Integer toBeConfirmed, LocalDateTime now);
+
+    @Select("select * from orders where status = #{deliveryInProgress};")
+    List<Orders> getByStatus(Integer deliveryInProgress);
 }
