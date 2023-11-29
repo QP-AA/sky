@@ -9,4 +9,15 @@
         (#{order.name}, #{order.image}, #{order.orderId}, #{order.dishId}, #{order.setmealId}, #{order.dishFlavor}, #{order.number}, #{order.amount})
     </foreach>
     </insert>
+    <select id="getTop10" resultType="com.sky.dto.GoodsSalesDTO">
+        # SELECT SUM(d.number) number, d.`name` FROM order_detail d LEFT JOIN
+        # orders o ON d.order_id = o.id WHERE o.`status` = 5 GROUP BY d.`name` ORDER BY number DESC LIMIT 10
+        SELECT d.`name`, SUM(d.number) number FROM order_detail d LEFT JOIN orders o ON d.order_id = o.id
+        <where>
+            o.status = 5
+            <if test="begin != null">and o.order_time &gt; #{begin}</if>
+            <if test="end != null">and o.order_time &lt; #{end}</if>
+        </where>
+        GROUP BY d.`name` ORDER BY number DESC LIMIT 10
+    </select>
 </mapper>

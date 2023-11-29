@@ -1,10 +1,13 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
+import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +37,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     /**
      * 统计指定时间内的营业额
@@ -106,6 +112,19 @@ public class ReportServiceImpl implements ReportService {
         orderReportVO.setOrderCountList(StringUtils.join(totOrderListRes, ","));
         orderReportVO.setValidOrderCountList(StringUtils.join(totOrderListRes, ","));
         return orderReportVO;
+    }
+
+    @Override
+    public SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end) {
+        List<GoodsSalesDTO> goodsSalesDTOS = orderDetailMapper.getTop10(LocalDateTime.of(begin, LocalTime.MIN), LocalDateTime.of(end, LocalTime.MAX));
+
+        String nameList = goodsSalesDTOS.stream().map(GoodsSalesDTO::getName).collect(Collectors.joining(","));
+        String numberList = goodsSalesDTOS.stream().map(x -> {
+            return Integer.toString(x.getNumber());
+        }).collect(Collectors.joining(","));
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList)
+                .numberList(numberList).build();
     }
 
     private List<LocalDate> date2List(LocalDate begin, LocalDate end) {
