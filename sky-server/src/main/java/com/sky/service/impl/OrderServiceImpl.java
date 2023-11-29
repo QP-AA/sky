@@ -283,7 +283,7 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
         order.setStatus(Orders.CANCELLED);
-        order.setCancelReason(ordersRejectionDTO.getRejectionReason());
+        order.setRejectionReason(ordersRejectionDTO.getRejectionReason());
         order.setCancelTime(LocalDateTime.now());
         orderMapper.update(order);
     }
