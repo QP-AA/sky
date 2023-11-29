@@ -45,4 +45,7 @@ public interface OrderMapper {
 
     @Select("select * from orders where status = #{deliveryInProgress};")
     List<Orders> getByStatus(Integer deliveryInProgress);
+
+    @Select("select COALESCE(sum(amount), 0) from orders where order_time > #{beginTime} and order_time < #{endTime} and status = #{status}")
+    Double statisticsAmount(LocalDateTime beginTime, LocalDateTime endTime, Integer status);
 }
