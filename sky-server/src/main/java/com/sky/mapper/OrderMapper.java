@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -48,4 +49,6 @@ public interface OrderMapper {
 
     @Select("select COALESCE(sum(amount), 0) from orders where order_time > #{beginTime} and order_time < #{endTime} and status = #{status}")
     Double statisticsAmount(LocalDateTime beginTime, LocalDateTime endTime, Integer status);
+
+    Integer getOrder(Map map);
 }

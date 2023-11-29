@@ -4,9 +4,9 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +73,39 @@ public class ReportServiceImpl implements ReportService {
         return UserReportVO.builder().dateList(StringUtils.join(dateList, ","))
                 .newUserList(StringUtils.join(newUserList, ","))
                 .totalUserList(StringUtils.join(totUserList, ",")).build();
+    }
+
+    @Override
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        OrderReportVO orderReportVO = new OrderReportVO();
+        List<LocalDate> dateList = date2List(begin, end);
+        List<Integer> validOrderListRes = new ArrayList<>();
+        List<Integer> totOrderListRes = new ArrayList<>();
+        Map totOrderList = new HashMap<>();
+        Map validOrderList = new HashMap<>();
+        validOrderList.put("status", Orders.COMPLETED);
+        validOrderList.put("begin", LocalDateTime.of(begin, LocalTime.MIN));
+        validOrderList.put("end", LocalDateTime.of(end, LocalTime.MAX));
+        totOrderList.put("begin", LocalDateTime.of(begin, LocalTime.MIN));
+        totOrderList.put("end", LocalDateTime.of(end, LocalTime.MAX));
+        Integer validOrder = orderMapper.getOrder(validOrderList);
+        Integer totOrder = orderMapper.getOrder(totOrderList);
+        dateList.forEach(x -> {
+            validOrderList.put("begin", LocalDateTime.of(x, LocalTime.MIN));
+            validOrderList.put("end", LocalDateTime.of(x, LocalTime.MAX));
+            totOrderList.put("begin", LocalDateTime.of(x, LocalTime.MIN));
+            totOrderList.put("end", LocalDateTime.of(x, LocalTime.MAX));
+            validOrderListRes.add(orderMapper.getOrder(validOrderList));
+            totOrderListRes.add(orderMapper.getOrder(totOrderList));
+        });
+
+        orderReportVO.setDateList(StringUtils.join(dateList));
+        orderReportVO.setTotalOrderCount(totOrder);
+        orderReportVO.setValidOrderCount(validOrder);
+        orderReportVO.setOrderCompletionRate(totOrder != 0 ? 1.0 * validOrder / totOrder : 0.0);
+        orderReportVO.setOrderCountList(StringUtils.join(totOrderListRes, ","));
+        orderReportVO.setValidOrderCountList(StringUtils.join(totOrderListRes, ","));
+        return orderReportVO;
     }
 
     private List<LocalDate> date2List(LocalDate begin, LocalDate end) {
